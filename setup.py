@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='Subfind3r',
-    version='1.0',
+    version='1.1',
     python_requires='>=2.7',
     install_requires=['dnspython', 'requests', 'argparse; python_version==\'2.7\''],
     packages=find_packages()+['.'],
@@ -16,7 +16,7 @@ setup(
         'Intended Audience :: Information Technology',
         'Intended Audience :: System Administrators',
         'Intended Audience :: Telecommunications Industry',
-        'License :: OSI Approved :: GNU General Public License v2',
+        'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
         'Operating System :: POSIX :: Linux',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
@@ -33,4 +33,6 @@ setup(
             'subfind3r = subfind3r:interactive',
         ],
     },
+    long_description = "SubFind3r is the continued version of Sublist3r. See more info at Github: [https://github.com/ASafarzadeh/Subfind3r](https://github.com/ASafarzadeh/Subfind3r)",
+    long_description_content_type='text/markdown',
 )
