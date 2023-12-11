@@ -1,16 +1,14 @@
-<a name="readme-top"></a>
-[![Contributors][contributors-shield]][contributors-url]
+<!--[![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/Subfind3r?style=for-the-badge)
+![PyPI - Status](https://img.shields.io/pypi/status/subfind3r?style=for-the-badge)
+![PyPI - Version](https://img.shields.io/pypi/v/subfind3r?style=for-the-badge)
+<br>-->
 
 
-<!-- PROJECT LOGO -->
-<br />
 <div align="center">
-<!--   <a href="https://github.com/othneildrew/Best-README-Template">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
-  </a> -->
 <pre>                                                                                              
  ____        _      __ _           _ _____      
 / ___| _   _| |__  / _(_)_ __   __| |___ / _ __ 
@@ -20,32 +18,37 @@
   <h1 align="center">Subfind3r</h1>
 
   <p align="center">
-    A continued version of <a href="https://github.com/aboul3la/Sublist3r">Sublist3r</a>
-    <br />
-<!--     <a href="https://github.com/othneildrew/Best-README-Template"><strong>Explore the docs »</strong></a> -->
-    <br />
-    <br />
-<!--     <a href="https://github.com/othneildrew/Best-README-Template">View Demo</a> -->
-<!--     · -->
-<!--     <a href="https://github.com/ASafarzadeh/Subfind3r/issues">Report Bug</a> -->
-<!--     ·
-    <a href="https://github.com/othneildrew/Best-README-Template/issues">Request Feature</a> -->
+    An improved version of <a href="https://github.com/aboul3la/Sublist3r">Sublist3r</a>
+    <br>
   </p>
 </div>
 
 
-<!-- ABOUT THE PROJECT -->
+
+### Quick start
+```
+pip install subfind3r
+```
+```
+subfind3r -d example.com
+```
+
 ## About Subfind3r
 
 ![ScreenShot](https://github.com/ASafarzadeh/Subfind3r/blob/main/demo.png?raw=true)
 
 
-Subfind3r is a continued version of [Sublist3r by aboul3la](https://github.com/aboul3la/Sublist3r) Since it has some problems in some of its functionalities, and also to make the chance for community to Contribute to a powerfull and fast Subdomain enumeration tool.
+Subfind3r is a improved version of [Sublist3r by aboul3la](https://github.com/aboul3la/Sublist3r) Since it has some problems in some of its functionalities, and also to make the chance for community to Contribute to a powerfull and fast Subdomain enumeration tool.
 
 
 ### Installation
 
-Subfind3r is on its way to pypi, so untill then you can use it using git clone command:
+Subfind3r can be easily installed by pip using:
+```
+pip install subfind3r
+```
+
+or you can use it using git clone command:
 
 ```
 git clone https://github.com/ASafarzadeh/Subfind3r
