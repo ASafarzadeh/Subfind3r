@@ -47,7 +47,8 @@ Subfind3r can be easily installed by pip using:
 ```
 pip install subfind3r
 ```
-`The pip way is recommended because it adds the script to the path automatically in mac and linux, and installs the needed dependencies automatically`
+*The pip way is recommended because it adds the script to the path automatically in mac and linux, and installs the needed dependencies automatically*
+<br>
 or you can use it using git clone command:
 
 ```
