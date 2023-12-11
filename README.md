@@ -38,7 +38,7 @@ subfind3r -d example.com
 ![ScreenShot](https://github.com/ASafarzadeh/Subfind3r/blob/main/demo.png?raw=true)
 
 
-Subfind3r is a improved version of [Sublist3r by aboul3la](https://github.com/aboul3la/Sublist3r) Since it has some problems in some of its functionalities, and also to make the chance for community to Contribute to a powerfull and fast Subdomain enumeration tool.
+Subfind3r is an improved version of [Sublist3r by aboul3la](https://github.com/aboul3la/Sublist3r) Since it has some problems in some of its functionalities, and also to make the chance for community to Contribute to a powerfull and fast Subdomain enumeration tool.
 
 
 ### Installation
@@ -47,13 +47,13 @@ Subfind3r can be easily installed by pip using:
 ```
 pip install subfind3r
 ```
-
+`The pip way is recommended because it adds the script to the path automatically in mac and linux, and installs the needed dependencies automatically`
 or you can use it using git clone command:
 
 ```
 git clone https://github.com/ASafarzadeh/Subfind3r
 ```
-Then you should install the dependencies if they arent already. Subfind3r depends on `requests`, `dnspython` and `argparse` python modules.<br><br>
+The pip way does all the installations for you, but in the git clone way you should install the dependencies if they arent already installed. Subfind3r depends on `requests`, `dnspython` and `argparse` python modules.<br><br>
 You can install them all with the command below:
 ```
 python -m pip install requests dnspython argparse
