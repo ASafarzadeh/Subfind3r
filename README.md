@@ -1,11 +1,10 @@
-<!--[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
+[![Contributors][contributors-shield]][contributors-url]
 [![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/Subfind3r?style=for-the-badge)
 ![PyPI - Status](https://img.shields.io/pypi/status/subfind3r?style=for-the-badge)
 ![PyPI - Version](https://img.shields.io/pypi/v/subfind3r?style=for-the-badge)
-<br>-->
+![PyPI - Downloads](https://img.shields.io/pypi/dm/subfind3r?style=for-the-badge)
+<br>
 
 
 <div align="center">
