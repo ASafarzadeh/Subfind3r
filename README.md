@@ -1,4 +1,3 @@
-[![Contributors][contributors-shield]][contributors-url]
 [![Stargazers][stars-shield]][stars-url]
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/Subfind3r?style=for-the-badge)
 ![PyPI - Status](https://img.shields.io/pypi/status/subfind3r?style=for-the-badge)
