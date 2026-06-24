@@ -2,7 +2,6 @@
 # coding: utf-8
 # subfind3r v1.0
 # By ASafarzadeh
-# Thanks to Ahmed Aboul-Ela - twitter.com/aboul3la
 
 # modules in standard library
 import re
@@ -85,7 +84,7 @@ def banner():
                                                                                               
 
 
-# Continued by ASafarzadeh, Thanks to aboul3la
+# By ASafarzadeh
 %s    """ % (B, G, Y))
 
 
@@ -150,7 +149,7 @@ def subdomain_sorting_key(hostname):
 class enumratorBase(object):
     def __init__(self, base_url, engine_name, domain, subdomains=None, silent=False, verbose=True):
         subdomains = subdomains or []
-        self.domain = urlparse.urlparse(domain).netloc
+        self.domain = urlparse.urlparse(domain).netloc.lower()
         self.session = requests.Session()
         self.subdomains = []
         self.timeout = 25
@@ -170,6 +169,14 @@ class enumratorBase(object):
         if not self.silent:
             print(text)
         return
+
+    def valid_subdomain(self, subdomain):
+        """A hostname is in scope only if it is a real subdomain of the target,
+        i.e. it ends with '.<domain>'. This rejects look-alikes such as
+        '21e6crypto.com' or 'virtual--crypto.com' when enumerating 'crypto.com'."""
+        if not subdomain:
+            return False
+        return subdomain.lower().endswith('.' + self.domain)
 
     def print_banner(self):
         """ subclass can override this if they want a fancy banner :)"""
@@ -298,7 +305,7 @@ class GoogleEnum(enumratorBaseThreaded):
                 if not link.startswith('http'):
                     link = "http://" + link
                 subdomain = urlparse.urlparse(link).netloc
-                if subdomain and subdomain not in self.subdomains and subdomain != self.domain:
+                if self.valid_subdomain(subdomain) and subdomain not in self.subdomains:
                     if self.verbose:
                         self.print_("%s%s: %s%s" % (R, self.engine_name, W, subdomain))
                     self.subdomains.append(subdomain.strip())
@@ -307,7 +314,7 @@ class GoogleEnum(enumratorBaseThreaded):
         return links_list
 
     def check_response_errors(self, resp):
-        if (type(resp) is str or type(resp) is unicode) and 'Our systems have detected unusual traffic' in resp:
+        if isinstance(resp, str) and 'Our systems have detected unusual traffic' in resp:
             self.print_(R + "[!] Error: Google probably now is blocking our requests" + W)
             self.print_(R + "[~] Finished now the Google Enumeration ..." + W)
             return False
@@ -351,9 +358,9 @@ class YahooEnum(enumratorBaseThreaded):
                 if not link.startswith('http'):
                     link = "http://" + link
                 subdomain = urlparse.urlparse(link).netloc
-                if not subdomain.endswith(self.domain):
+                if not self.valid_subdomain(subdomain):
                     continue
-                if subdomain and subdomain not in self.subdomains and subdomain != self.domain:
+                if subdomain not in self.subdomains:
                     if self.verbose:
                         self.print_("%s%s: %s%s" % (R, self.engine_name, W, subdomain))
                     self.subdomains.append(subdomain.strip())
@@ -398,7 +405,7 @@ class AskEnum(enumratorBaseThreaded):
                 if not link.startswith('http'):
                     link = "http://" + link
                 subdomain = urlparse.urlparse(link).netloc
-                if subdomain not in self.subdomains and subdomain != self.domain:
+                if self.valid_subdomain(subdomain) and subdomain not in self.subdomains:
                     if self.verbose:
                         self.print_("%s%s: %s%s" % (R, self.engine_name, W, subdomain))
                     self.subdomains.append(subdomain.strip())
@@ -447,7 +454,7 @@ class BingEnum(enumratorBaseThreaded):
                 if not link.startswith('http'):
                     link = "http://" + link
                 subdomain = urlparse.urlparse(link).netloc
-                if subdomain not in self.subdomains and subdomain != self.domain:
+                if self.valid_subdomain(subdomain) and subdomain not in self.subdomains:
                     if self.verbose:
                         self.print_("%s%s: %s%s" % (R, self.engine_name, W, subdomain))
                     self.subdomains.append(subdomain.strip())
@@ -490,9 +497,9 @@ class BaiduEnum(enumratorBaseThreaded):
                 if not link.startswith('http'):
                     link = "http://" + link
                 subdomain = urlparse.urlparse(link).netloc
-                if subdomain.endswith(self.domain):
+                if self.valid_subdomain(subdomain):
                     subdomain_list.append(subdomain)
-                    if subdomain not in self.subdomains and subdomain != self.domain:
+                    if subdomain not in self.subdomains:
                         found_newdomain = True
                         if self.verbose:
                             self.print_("%s%s: %s%s" % (R, self.engine_name, W, subdomain))
@@ -590,9 +597,9 @@ class NetcraftEnum(enumratorBaseThreaded):
             links_list = link_regx.findall(resp)
             for link in links_list:
                 subdomain = urlparse.urlparse(link).netloc
-                if not subdomain.endswith(self.domain):
+                if not self.valid_subdomain(subdomain):
                     continue
-                if subdomain and subdomain not in self.subdomains and subdomain != self.domain:
+                if subdomain not in self.subdomains:
                     if self.verbose:
                         self.print_("%s%s: %s%s" % (R, self.engine_name, W, subdomain))
                     self.subdomains.append(subdomain.strip())
@@ -673,9 +680,9 @@ class DNSdumpster(enumratorBaseThreaded):
         links = list(set(links_list))
         for link in links:
             subdomain = link.strip()
-            if not subdomain.endswith(self.domain):
+            if not self.valid_subdomain(subdomain):
                 continue
-            if subdomain and subdomain not in self.subdomains and subdomain != self.domain:
+            if subdomain not in self.subdomains:
                 self.subdomains.append(subdomain.strip())
         return links
 
@@ -693,8 +700,6 @@ class Virustotal(enumratorBaseThreaded):
     # the main send_req need to be rewritten
     def send_req(self, url):
         try:
-            args = parse_args()
-            vt_apikey = args.vtkey
             headers = dict(self.headers)
             headers['x-apikey'] = vt_apikey
             resp = self.session.get(url, headers=headers, timeout=self.timeout)
@@ -725,9 +730,9 @@ class Virustotal(enumratorBaseThreaded):
             for i in resp['data']:
                 if i['type'] == 'domain':
                     subdomain = i['id']
-                    if not subdomain.endswith(self.domain):
+                    if not self.valid_subdomain(subdomain):
                         continue
-                    if subdomain not in self.subdomains and subdomain != self.domain:
+                    if subdomain not in self.subdomains:
                         if self.verbose:
                             self.print_("%s%s: %s%s" % (R, self.engine_name, W, subdomain))
                         self.subdomains.append(subdomain.strip())
@@ -763,9 +768,9 @@ class ThreatCrowd(enumratorBaseThreaded):
             links = json.loads(resp)['subdomains']
             for link in links:
                 subdomain = link.strip()
-                if not subdomain.endswith(self.domain):
+                if not self.valid_subdomain(subdomain):
                     continue
-                if subdomain not in self.subdomains and subdomain != self.domain:
+                if subdomain not in self.subdomains:
                     if self.verbose:
                         self.print_("%s%s: %s%s" % (R, self.engine_name, W, subdomain))
                     self.subdomains.append(subdomain.strip())
@@ -776,10 +781,59 @@ class ThreatCrowd(enumratorBaseThreaded):
 class CrtSearch(enumratorBaseThreaded):
     def __init__(self, domain, subdomains=None, q=None, silent=False, verbose=True):
         subdomains = subdomains or []
-        base_url = 'https://crt.sh/?q=%25.{domain}'
+        base_url = 'https://crt.sh/?q=%25.{domain}&output=json'
         self.engine_name = "SSL Certificates"
         self.q = q
         super(CrtSearch, self).__init__(base_url, self.engine_name, domain, subdomains, q=q, silent=silent, verbose=verbose)
+        return
+
+    def req(self, url):
+        # crt.sh is frequently overloaded and answers 502/503; retry a few times.
+        for _ in range(4):
+            try:
+                resp = self.session.get(url, headers=self.headers, timeout=self.timeout)
+            except Exception:
+                resp = None
+            if resp is not None and resp.status_code == 200 and resp.text.strip():
+                return resp.text
+            time.sleep(3)
+        return None
+
+    def enumerate(self):
+        url = self.base_url.format(domain=self.domain)
+        resp = self.req(url)
+        if resp:
+            self.extract_domains(resp)
+        return self.subdomains
+
+    def add_subdomain(self, name):
+        subdomain = name.strip().lower()
+        if subdomain.startswith('*.'):
+            subdomain = subdomain[2:]
+        if '@' in subdomain:
+            subdomain = subdomain[subdomain.find('@') + 1:]
+        if self.valid_subdomain(subdomain) and subdomain not in self.subdomains:
+            if self.verbose:
+                self.print_("%s%s: %s%s" % (R, self.engine_name, W, subdomain))
+            self.subdomains.append(subdomain)
+
+    def extract_domains(self, resp):
+        try:
+            for cert in json.loads(resp):
+                # name_value may hold several newline-separated names per cert
+                for name in cert.get('name_value', '').splitlines():
+                    self.add_subdomain(name)
+                self.add_subdomain(cert.get('common_name', ''))
+        except Exception:
+            pass
+
+class AlienVault(enumratorBaseThreaded):
+    def __init__(self, domain, subdomains=None, q=None, silent=False, verbose=True):
+        subdomains = subdomains or []
+        base_url = 'https://otx.alienvault.com/api/v1/indicators/domain/{domain}/passive_dns'
+        self.engine_name = "AlienVault"
+        self.q = q
+        super(AlienVault, self).__init__(base_url, self.engine_name, domain, subdomains, q=q, silent=silent, verbose=verbose)
         return
 
     def req(self, url):
@@ -787,7 +841,6 @@ class CrtSearch(enumratorBaseThreaded):
             resp = self.session.get(url, headers=self.headers, timeout=self.timeout)
         except Exception:
             resp = None
-
         return self.get_response(resp)
 
     def enumerate(self):
@@ -798,31 +851,126 @@ class CrtSearch(enumratorBaseThreaded):
         return self.subdomains
 
     def extract_domains(self, resp):
-        link_regx = re.compile('<TD>(.*?)</TD>')
         try:
-            links = link_regx.findall(resp)
-            for link in links:
-                link = link.strip()
-                subdomains = []
-                if '<BR>' in link:
-                    subdomains = link.split('<BR>')
-                else:
-                    subdomains.append(link)
+            records = json.loads(resp).get('passive_dns', [])
+            for record in records:
+                subdomain = record.get('hostname', '').strip().lower()
+                if self.valid_subdomain(subdomain) and subdomain not in self.subdomains:
+                    if self.verbose:
+                        self.print_("%s%s: %s%s" % (R, self.engine_name, W, subdomain))
+                    self.subdomains.append(subdomain)
+        except Exception:
+            pass
 
-                for subdomain in subdomains:
-                    if not subdomain.endswith(self.domain) or '*' in subdomain:
-                        continue
 
-                    if '@' in subdomain:
-                        subdomain = subdomain[subdomain.find('@')+1:]
+class HackerTarget(enumratorBaseThreaded):
+    def __init__(self, domain, subdomains=None, q=None, silent=False, verbose=True):
+        subdomains = subdomains or []
+        base_url = 'https://api.hackertarget.com/hostsearch/?q={domain}'
+        self.engine_name = "HackerTarget"
+        self.q = q
+        super(HackerTarget, self).__init__(base_url, self.engine_name, domain, subdomains, q=q, silent=silent, verbose=verbose)
+        return
 
-                    if subdomain not in self.subdomains and subdomain != self.domain:
+    def req(self, url):
+        try:
+            resp = self.session.get(url, headers=self.headers, timeout=self.timeout)
+        except Exception:
+            resp = None
+        return self.get_response(resp)
+
+    def enumerate(self):
+        url = self.base_url.format(domain=self.domain)
+        resp = self.req(url)
+        if resp:
+            self.extract_domains(resp)
+        return self.subdomains
+
+    def extract_domains(self, resp):
+        for line in str(resp).splitlines():
+            subdomain = line.split(',')[0].strip().lower()
+            if self.valid_subdomain(subdomain) and subdomain not in self.subdomains:
+                if self.verbose:
+                    self.print_("%s%s: %s%s" % (R, self.engine_name, W, subdomain))
+                self.subdomains.append(subdomain)
+
+
+class RapidDns(enumratorBaseThreaded):
+    def __init__(self, domain, subdomains=None, q=None, silent=False, verbose=True):
+        subdomains = subdomains or []
+        base_url = 'https://rapiddns.io/subdomain/{domain}?full=1'
+        self.engine_name = "RapidDNS"
+        self.q = q
+        super(RapidDns, self).__init__(base_url, self.engine_name, domain, subdomains, q=q, silent=silent, verbose=verbose)
+        return
+
+    def req(self, url):
+        try:
+            resp = self.session.get(url, headers=self.headers, timeout=self.timeout)
+        except Exception:
+            resp = None
+        return self.get_response(resp)
+
+    def enumerate(self):
+        url = self.base_url.format(domain=self.domain)
+        resp = self.req(url)
+        if resp:
+            self.extract_domains(resp)
+        return self.subdomains
+
+    def extract_domains(self, resp):
+        link_regx = re.compile('<td>(.*?)</td>')
+        try:
+            for link in link_regx.findall(str(resp)):
+                subdomain = link.strip().lower()
+                if self.valid_subdomain(subdomain) and subdomain not in self.subdomains:
+                    if self.verbose:
+                        self.print_("%s%s: %s%s" % (R, self.engine_name, W, subdomain))
+                    self.subdomains.append(subdomain)
+        except Exception:
+            pass
+
+
+class CertSpotter(enumratorBaseThreaded):
+    def __init__(self, domain, subdomains=None, q=None, silent=False, verbose=True):
+        subdomains = subdomains or []
+        base_url = 'https://api.certspotter.com/v1/issuances?domain={domain}&include_subdomains=true&expand=dns_names'
+        self.engine_name = "CertSpotter"
+        self.q = q
+        super(CertSpotter, self).__init__(base_url, self.engine_name, domain, subdomains, q=q, silent=silent, verbose=verbose)
+        return
+
+    def req(self, url):
+        try:
+            resp = self.session.get(url, headers=self.headers, timeout=self.timeout)
+        except Exception:
+            resp = None
+        return self.get_response(resp)
+
+    def enumerate(self):
+        url = self.base_url.format(domain=self.domain)
+        resp = self.req(url)
+        if resp:
+            self.extract_domains(resp)
+        return self.subdomains
+
+    def extract_domains(self, resp):
+        try:
+            issuances = json.loads(resp)
+            if not isinstance(issuances, list):
+                return
+            for issuance in issuances:
+                for name in issuance.get('dns_names', []):
+                    subdomain = name.strip().lower()
+                    if subdomain.startswith('*.'):
+                        subdomain = subdomain[2:]
+                    if self.valid_subdomain(subdomain) and subdomain not in self.subdomains:
                         if self.verbose:
                             self.print_("%s%s: %s%s" % (R, self.engine_name, W, subdomain))
-                        self.subdomains.append(subdomain.strip())
-        except Exception as e:
-            print(e)
+                        self.subdomains.append(subdomain)
+        except Exception:
             pass
+
 
 class portscan():
     def __init__(self, subdomains, ports):
@@ -854,7 +1002,11 @@ class portscan():
             t.start()
 
 
-def main(domain, threads, savefile, ports, silent, verbose, enable_bruteforce, engines):
+def main(domain, threads, savefile, ports, silent, verbose, enable_bruteforce, engines, vtkey=None):
+    global vt_apikey
+    if vtkey is not None:
+        vt_apikey = vtkey
+
     bruteforce_list = set()
     search_list = set()
 
@@ -894,26 +1046,24 @@ def main(domain, threads, savefile, ports, silent, verbose, enable_bruteforce, e
                          'dnsdumpster': DNSdumpster,
                          'virustotal': Virustotal,
                          'threatcrowd': ThreatCrowd,
-                         'ssl': CrtSearch
+                         'ssl': CrtSearch,
+                         'alienvault': AlienVault,
+                         'hackertarget': HackerTarget,
+                         'rapiddns': RapidDns,
+                         'certspotter': CertSpotter
                         }
 
     chosenEnums = []
 
     if engines is None:
-        args = parse_args()
-        vtkey = args.vtkey
-        if(vtkey == "<your-apikey>"):
-            chosenEnums = [
-                BaiduEnum, YahooEnum, GoogleEnum, BingEnum, AskEnum,
-                NetcraftEnum, DNSdumpster, ThreatCrowd,
-                CrtSearch
-            ]
-        else:
-            chosenEnums = [
-                BaiduEnum, YahooEnum, GoogleEnum, BingEnum, AskEnum,
-                NetcraftEnum, DNSdumpster, Virustotal, ThreatCrowd,
-                CrtSearch
-            ]
+        # Default to reliable API-based passive sources. The legacy search-engine
+        # scrapers (google/yahoo/bing/baidu/ask) and the defunct threatcrowd remain
+        # available via -e for anyone who still wants them.
+        chosenEnums = [
+            CrtSearch, AlienVault, HackerTarget, RapidDns, CertSpotter, DNSdumpster
+        ]
+        if vt_apikey and vt_apikey != "<your-apikey>":
+            chosenEnums.append(Virustotal)
 
     else:
         engines = engines.split(',')
@@ -979,13 +1129,12 @@ def interactive():
     verbose = args.verbose
     engines = args.engines
     vt_apikey = args.vtkey
-    print(vt_apikey)
     if verbose or verbose is None:
         verbose = True
     if args.no_color:
         no_color()
     banner()
-    res = main(domain, threads, savefile, ports, silent=False, verbose=verbose, enable_bruteforce=enable_bruteforce, engines=engines)
+    res = main(domain, threads, savefile, ports, silent=False, verbose=verbose, enable_bruteforce=enable_bruteforce, engines=engines, vtkey=vt_apikey)
 
 if __name__ == "__main__":
     interactive()

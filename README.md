@@ -75,7 +75,7 @@ Short Form    | Long Form     | Description
 -v            | --verbose     | Enable the verbose mode and display results in realtime
 -vt           | --vtkey       | Virus Total Api key(Optional)
 -t            | --threads     | Number of threads to use for subbrute bruteforce
--e            | --engines     | Specify a comma-separated list of search engines
+-e            | --engines     | Specify a comma-separated list of engines (see list below)
 -o            | --output      | Save the results to text file
 -h            | --help        | show the help message and exit
 
@@ -101,9 +101,11 @@ Short Form    | Long Form     | Description
 
 ``python subfind3r.py -b -d example.com``
 
-* To enumerate subdomains and use specific engines such Google, Yahoo and Virustotal engines
+* To enumerate subdomains using only specific engines:
 
-``python subfind3r.py -e google,yahoo,virustotal -d example.com``
+``python subfind3r.py -e ssl,certspotter,hackertarget -d example.com``
+
+  By default Subfind3r queries reliable passive API sources: `ssl` (crt.sh), `alienvault`, `hackertarget`, `rapiddns`, `certspotter` and `dnsdumpster` (plus `virustotal` when an API key is given). The legacy search-engine scrapers (`google`, `yahoo`, `bing`, `baidu`, `ask`, `netcraft`, `threatcrowd`) are still selectable via `-e` but are no longer used by default because they are frequently blocked or defunct.
 
 * With any of the examples above, you can add your <a href="https://www.virustotal.com/">Virus Total Api key</a> to enable VirusTotal search
 
